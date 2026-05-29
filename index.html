@@ -46,7 +46,14 @@
   #drop{color:#4e5862;font-size:13px;text-align:center;font-weight:300;}
   #fi{display:none;}
   #stage.over{outline:1px dashed rgba(255,255,255,.3);outline-offset:-12px;}
-  @media(max-width:720px){#wrap{flex-direction:column;}#side{width:100%;flex:none;height:auto;}#stage{min-height:60vh;}}
+  @media(max-width:720px){
+    #wrap{flex-direction:column;}
+    #side{width:100%;flex:none;height:auto;max-height:none;overflow:visible;}
+    #stage{min-height:auto;padding:16px;}
+    #stage.empty{min-height:0;padding:0;}
+    #stage.empty #drop{display:none;}
+    #drop.in-side{display:block;border:1px dashed rgba(255,255,255,.15);border-radius:6px;padding:22px 12px;margin-bottom:10px;color:#5b636d;}
+  }
 </style>
 </head>
 <body>
@@ -128,6 +135,21 @@ stage.addEventListener('dragleave',()=>stage.classList.remove('over'));
 stage.addEventListener('drop',e=>{e.preventDefault();stage.classList.remove('over');if(e.dataTransfer.files[0])load(e.dataTransfer.files[0]);});
 fi.addEventListener('change',()=>{if(fi.files[0])load(fi.files[0]);});
 function load(file){const r=new FileReader();r.onload=e=>{img=new Image();img.onload=()=>{drop.style.display='none';oc.style.display='block';stage.classList.remove('empty');zones=[];detect();render();};img.src=e.target.result;};r.readAsDataURL(file);}
+
+// Reposicionar el drop zone: en móvil, debajo del botón "Replace image" del sidebar.
+const replaceBtn=document.getElementById('replace');
+function placeDrop(){
+  const mobile=window.matchMedia('(max-width:720px)').matches;
+  if(mobile && drop.parentElement===stage){
+    replaceBtn.insertAdjacentElement('afterend',drop);
+    drop.classList.add('in-side');
+  } else if(!mobile && drop.parentElement!==stage){
+    stage.appendChild(drop);
+    drop.classList.remove('in-side');
+  }
+}
+placeDrop();
+window.addEventListener('resize',placeDrop);
 
 function bind(id,fmt,re){const e=document.getElementById(id),o=document.getElementById(id+'-o');e.addEventListener('input',()=>{if(o)o.textContent=fmt?fmt(e.value):e.value;if(img){if(re)detect();render();}});}
 bind('iop',v=>(+v).toFixed(2));bind('ms',v=>(+v).toFixed(2)+'×');bind('cs',v=>(+v).toFixed(2)+'×');bind('nd',null,true);bind('cx');bind('se',null,true);bind('lb',v=>(+v).toFixed(2));bind('lw',v=>(+v).toFixed(1));bind('go',v=>(+v).toFixed(2));bind('psz');bind('zsz');bind('dash');
