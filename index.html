@@ -44,7 +44,7 @@
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
   #oc{max-width:100%;max-height:90vh;display:none;box-shadow:0 8px 40px rgba(0,0,0,.6);border-radius:2px;}
   #drop{color:#4e5862;font-size:13px;text-align:center;font-weight:300;}
-  #fi{display:none;}
+  #fi{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;}
   #stage.over{outline:1px dashed rgba(255,255,255,.3);outline-offset:-12px;}
   @media(max-width:720px){
     #wrap{flex-direction:column;}
@@ -129,6 +129,7 @@ RATIOS.forEach((r,i)=>{const b=document.createElement('button');b.className='bg'
 const stage=document.getElementById('stage'),fi=document.getElementById('fi'),oc=document.getElementById('oc'),drop=document.getElementById('drop');
 function pick(){fi.click();}
 stage.addEventListener('click',e=>{if(!img){pick();return;}if(e.target===oc)placeZone(e);});
+drop.addEventListener('click',e=>{e.stopPropagation();pick();});
 document.getElementById('replace').onclick=pick;
 stage.addEventListener('dragover',e=>{e.preventDefault();stage.classList.add('over');});
 stage.addEventListener('dragleave',()=>stage.classList.remove('over'));
